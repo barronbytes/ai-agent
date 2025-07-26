@@ -25,7 +25,7 @@ def get_contents(working_directory, directory):
 def get_files_info(working_directory, directory="."):
     contents = get_contents(working_directory, directory)
     if isinstance(contents, str) and contents.startswith("Error:"):
-        return contents
+        return (contents, directory)
 
     lines = []
     for item in contents:
@@ -36,6 +36,16 @@ def get_files_info(working_directory, directory="."):
             lines.append(f"- {item}: file_size={file_size} bytes, is_dir={is_dir}")
         except Exception as e:
             lines.append(f"- {item}: Error: {str(e)}")
-    return lines
+    return (lines, directory)
 
-print(get_files_info(root_dir(), "."))
+
+def generate_report(lines, directory):
+    message = ""
+    if isinstance(lines, str) and lines.startswith("Error:"):                                        
+        message = '\tError: Cannot list "{directory}" as it is outside the permitted working directory'
+    else:
+        message = "\n".join(lines)
+    return f"Result for '{directory}' directory:\n{message}"
+
+lines, directory = get_files_info(root_dir(), "calculator/pkg")
+message = generate_report(lines, directory)
