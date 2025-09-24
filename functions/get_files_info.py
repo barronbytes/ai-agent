@@ -10,11 +10,13 @@ def root_dir() -> str:
 
 
 def get_contents(working_directory, directory):
-    # Returns directory contents if path originals from root path, otherwise returns error message
+    # Returns the contents of a directory if it is within the root path; otherwise, returns an error message
     try:
         full_path = os.path.join(working_directory, directory)
-        if not os.path.abspath(full_path).startswith(os.path.abspath(working_directory)): # valid path but not from root directory
+        if not os.path.abspath(full_path).startswith(os.path.abspath(working_directory)):
             return f'Error: Cannot list "{directory}" as it is outside the permitted working directory'
+            # valid path but not from root directory
+            # safeguards against `traversal attacks` like `directory=..\..\..`
         if not os.path.isdir(full_path): # valid path but not a directory (i.e., a file)
             return f'Error: "{directory}" is not a valid directory'
         return os.listdir(full_path)
