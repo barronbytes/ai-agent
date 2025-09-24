@@ -1,8 +1,12 @@
-import sys
-import os
+import sys # interact with Python runtime → interpreter settings, arguments, system-level information
+import os # interact with operating system → files, directories, environmental variables, processes
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
+
+
+load_dotenv()
+AI_MODEL = "gemini-2.0-flash-001"
 
 
 if len(sys.argv) == 1:
@@ -12,9 +16,16 @@ if len(sys.argv) == 1:
     sys.exit(1)
 
 
+def get_system_prompts():
+    args = sys.argv[1:] # index 0 is always the Python file name, so it can be ignored
+    user_prompt = " ".join(args)
+    is_verbose = bool(args[-1] == "--verbose")
+    return [user_prompt, is_verbose]
+
+
 def generate_response(client, messages):
     response = client.models.generate_content(
-        model='gemini-2.0-flash-001',
+        model=AI_MODEL,
         contents=messages,
     )
     return response
@@ -30,12 +41,9 @@ def generate_content(response, user_prompt, is_verbose):
 
 
 def main():
-    load_dotenv()
-    args = sys.argv[1:]
+    user_prompt, is_verbose = get_system_prompts()
     api_key = os.environ.get("GEMINI_API_KEY")
     client = genai.Client(api_key=api_key)
-    user_prompt = " ".join(args)
-    is_verbose = bool(args[-1] == "--verbose")
     messages = [
         types.Content(role="user", parts=[types.Part(text=user_prompt)]),
     ]
