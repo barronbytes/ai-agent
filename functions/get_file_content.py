@@ -1,0 +1,31 @@
+import os
+from dotenv import load_dotenv
+
+
+load_dotenv()
+MAX_CHAR_LIMIT = int(os.getenv("MAX_CHAR_LIMIT"))
+
+
+def root_dir() -> str:
+    # Returns root path
+    file_path = os.path.abspath(__file__)
+    current_dir = os.path.dirname(file_path)
+    root_dir = os.path.abspath(os.path.join(current_dir, ".."))
+    return root_dir
+
+
+def get_file_content(directory, file_path):
+    # Returns the contents of a file if it is within the root path; otherwise, returns an error message
+    try:
+        full_path = os.path.join(root_dir(), directory, file_path)
+        if not os.path.abspath(full_path).startswith(os.path.abspath(root_dir())):
+            return f'Error: Cannot list "{file_path}" as it is outside the permitted working directory'
+            # valid path but not from root directory
+            # safeguards against `traversal attacks` like `file_path=..\..\..`
+        if not os.path.isfile(full_path): # valid path but not a file (i.e., a directory)
+            return f'Error: File not found or is not a regular file: "{file_path}"'
+        with open(full_path, mode="r", encoding="utf-8") as f:
+            content = f.read()
+            return content[:MAX_CHAR_LIMIT]  # truncate to limit
+    except Exception as e:
+        return f"Error: {str(e)}" # invalid file path provided, etc.    

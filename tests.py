@@ -1,7 +1,20 @@
 import os
-from functions.get_files_info import get_files_info, generate_report, root_dir
+#from functions.get_files_info import get_files_info, generate_report, root_dir
+from functions.get_file_content import get_file_content
+
+def test():
+    directory= "calculator"
+    
+    print(get_file_content(directory, "main.py"))
+    print()
+    print(get_file_content(directory, "pkg/calculator.py"))
+    print()
+    print(get_file_content(directory, "/bin/cat"))
+    print()
+    print(get_file_content(directory, "pkg/does_not_exist.py"))
 
 
+"""
 def test():
     working_dir = root_dir()
 
@@ -20,6 +33,7 @@ def test():
 
     # Test invalid ../ directory
     print(generate_report(*get_files_info(working_dir, "../")))
+"""
 
 
 if __name__ == "__main__":
