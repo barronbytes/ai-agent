@@ -1,17 +1,10 @@
 import os
-from dotenv import load_dotenv
+from dotenv import load_dotenv # type: ignore
+from functions.utils import root_dir
 
 
 load_dotenv()
 MAX_CHAR_LIMIT = int(os.getenv("MAX_CHAR_LIMIT"))
-
-
-def root_dir() -> str:
-    # Returns root path
-    file_path = os.path.abspath(__file__)
-    current_dir = os.path.dirname(file_path)
-    root_dir = os.path.abspath(os.path.join(current_dir, ".."))
-    return root_dir
 
 
 def get_file_content(directory, file_path):

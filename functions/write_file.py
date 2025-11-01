@@ -1,12 +1,5 @@
 import os
-
-
-def root_dir() -> str:
-    # Returns root path
-    file_path = os.path.abspath(__file__)
-    current_dir = os.path.dirname(file_path)
-    root_dir = os.path.abspath(os.path.join(current_dir, ".."))
-    return root_dir
+from functions.utils import root_dir
 
 
 def write_file(directory, file_path, content):

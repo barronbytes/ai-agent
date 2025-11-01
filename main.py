@@ -1,8 +1,8 @@
 import sys # interact with Python runtime → interpreter settings, arguments, system-level information
 import os # interact with operating system → files, directories, environmental variables, processes
-from dotenv import load_dotenv
+from dotenv import load_dotenv  # type: ignore
 from google import genai
-from google.genai import types
+from google.genai import types  # type: ignore
 
 
 load_dotenv()
