@@ -51,3 +51,4 @@ def generate_report(lines, directory):
 
 lines, directory = get_files_info(root_dir(), "calculator/pkg")
 message = generate_report(lines, directory)
+print(message)
