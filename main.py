@@ -3,7 +3,7 @@ import os # interact with operating system → files, directories, environmental
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
-from functions.get_files_info import schema_get_files_info
+from functions.schemas import *
 
 
 load_dotenv()
@@ -50,7 +50,7 @@ def print_report(response, user_prompt, is_verbose):
 
 
 def main():
-    # Step #1: Define a function declaration (done in functions.get_files_info)
+    # Step #1: Define a function declaration (done in functions.<file_names>.py)
     # Step #2: Call the model with function declarations
 
     # Configure the client and tools
@@ -59,6 +59,9 @@ def main():
         # Available functions
         function_declarations=[
             schema_get_files_info,
+            schema_get_file_content,
+            schema_write_file,
+            schema_run_python_file,
         ]
     )
     config=types.GenerateContentConfig(
