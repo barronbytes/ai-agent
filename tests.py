@@ -1,15 +1,21 @@
 import os
-from functions.write_file import write_file
+from functions.run_python_file import run_python_file
 
 
 def test():
     directory= "calculator"
-    t1 = write_file(directory, "lorem.txt", "wait, this isn't lorem ipsum")
-    t2 = write_file(directory, "pkg/morelorem.txt", "lorem ipsum dolor sit amet")
-    t3 = write_file(directory, "/tmp/temp.txt", "this should not be allowed")
+    t1 = run_python_file(directory, "main.py")
+    t2 = run_python_file(directory, "main.py", ["3 + 5"])
+    t3 = run_python_file(directory, "tests.py")
+    t4 = run_python_file(directory, "../main.py")
+    t5 = run_python_file(directory, "nonexistent.py")
+    t6 = run_python_file(directory, "lorem.txt")
     print(t1)
     print(t2)
     print(t3)
+    print(t4)
+    print(t5)
+    print(t6)
 
 
 if __name__ == "__main__":
