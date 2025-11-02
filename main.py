@@ -24,9 +24,13 @@ def get_system_prompts():
 
 
 def generate_response(client, messages):
+    system_prompt=os.getenv("SYSTEM_PROMPT")
     response = client.models.generate_content(
         model=AI_MODEL,
         contents=messages,
+        config=types.GenerateContentConfig(
+            system_instruction=system_prompt,
+        ),
     )
     return response
 
@@ -42,7 +46,7 @@ def generate_content(response, user_prompt, is_verbose):
 
 def main():
     user_prompt, is_verbose = get_system_prompts()
-    api_key = os.environ.get("GEMINI_API_KEY")
+    api_key = os.getenv("GEMINI_API_KEY")
     client = genai.Client(api_key=api_key)
     messages = [
         types.Content(role="user", parts=[types.Part(text=user_prompt)]),
