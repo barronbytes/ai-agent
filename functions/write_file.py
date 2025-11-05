@@ -2,7 +2,7 @@ import os
 from functions.utils import root_dir
 
 
-def write_file(working_directory, file_path, content):
+def write_file(working_directory: str, file_path: str, content: str) -> str:
     try:
         full_path = os.path.join(root_dir(), working_directory, file_path)
         # Safeguard against directory traversal

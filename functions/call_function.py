@@ -27,7 +27,7 @@ function_schemas = types.Tool(
 )
 
 
-def call_function(function_call: types.FunctionCall, verbose:bool=False):
+def call_function(function_call: types.FunctionCall, verbose: bool=False) -> types.Content:
     if verbose:
         print(f"Calling function: {function_call.name}({function_call.args})")
     else:
@@ -49,6 +49,7 @@ def call_function(function_call: types.FunctionCall, verbose:bool=False):
         )
     # Successful function call
     else:
+        # Security measure to set working directory
         args = dict(function_call.args)
         args["working_directory"] = WORKING_DIR
         tool_function = map_to_function[function_name](**args)

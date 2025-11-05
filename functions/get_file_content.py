@@ -7,7 +7,7 @@ load_dotenv()
 MAX_CHAR_LIMIT = int(os.getenv("MAX_CHAR_LIMIT"))
 
 
-def get_file_content(working_directory, file_path):
+def get_file_content(working_directory: str, file_path: str) -> str:
     # Returns the contents of a file if it is within the root path; otherwise, returns an error message
     try:
         full_path = os.path.join(root_dir(), working_directory, file_path)

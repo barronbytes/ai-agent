@@ -2,7 +2,7 @@ import os
 from functions.utils import root_dir
 
 
-def get_files_info(working_directory, directory="."):
+def get_files_info(working_directory: str, directory: str=".") -> str:
     """
     Returns files with metadata at the path: root_dir() + working_directory + directory
     """
