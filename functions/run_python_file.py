@@ -3,9 +3,9 @@ import subprocess
 from functions.utils import root_dir
 
 
-def run_python_file(directory, file_path, args=[]):
+def run_python_file(working_directory, file_path, args=[]):
     try:
-        full_path = os.path.join(root_dir(), directory, file_path)
+        full_path = os.path.join(root_dir(), working_directory, file_path)
         # Safeguard against directory traversal
         if ".." in file_path.split(os.path.sep) or not os.path.abspath(full_path).startswith(os.path.abspath(root_dir())):
             return f'Error: Cannot execute "{file_path}" as it is outside the permitted working directory'

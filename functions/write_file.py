@@ -2,9 +2,9 @@ import os
 from functions.utils import root_dir
 
 
-def write_file(directory, file_path, content):
+def write_file(working_directory, file_path, content):
     try:
-        full_path = os.path.join(root_dir(), directory, file_path)
+        full_path = os.path.join(root_dir(), working_directory, file_path)
         # Safeguard against directory traversal
         if not os.path.abspath(full_path).startswith(os.path.abspath(root_dir())):
             return f'Error: Cannot write to "{file_path}" as it is outside the permitted working directory'

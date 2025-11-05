@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 from functions.schemas import *
+from functions.call_function import function_schemas, call_function
 
 
 load_dotenv()
@@ -19,14 +20,18 @@ if len(sys.argv) == 1:
     sys.exit(1)
 
 
-def get_system_prompts():
+def get_system_prompts() -> tuple[str, bool]:
     args = sys.argv[1:] # index 0 is always the Python file name, so it can be ignored
     user_prompt = " ".join(args)
     is_verbose = bool(args[-1] == "--verbose")
-    return [user_prompt, is_verbose]
+    return (user_prompt, is_verbose)
 
 
-def get_response(client, config, contents):
+def get_response(
+    client: genai.Client, 
+    config: types.GenerateContentConfig, 
+    contents: list[types.Content]
+) -> types.GenerateContentResponse:
     return client.models.generate_content(
         model=AI_MODEL,
         config=config,
@@ -34,19 +39,37 @@ def get_response(client, config, contents):
     )
 
 
-def print_report(response, user_prompt, is_verbose):
+def get_function_response_parts(
+    response: types.GenerateContentResponse, 
+    user_prompt: str, 
+    is_verbose: bool
+) -> list[types.Part]:
     if is_verbose:
         print(f"User prompt: {user_prompt}")
         print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
         print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
 
-    
+    function_response_parts: list[types.Part] = []
     if not response.function_calls:
         print("Response:")
         print(response.text)
     else:
-        for function_call_part in response.function_calls:
-            print(f"Calling function: {function_call_part.name}({function_call_part.args})")
+        # Function execution
+        for function_call in response.function_calls:
+            tool_function_content = call_function(function_call, is_verbose)
+        
+            if not tool_function_content.parts or not tool_function_content.parts[0].function_response:
+                raise Exception("Empty function call result")
+
+            if is_verbose:
+                print(f"-> {tool_function_content.parts[0].function_response.response}")
+
+            # Function execution results
+            function_response_parts.append(tool_function_content.parts[0])
+        if not function_response_parts:
+            raise Exception("No function responses generated, exiting.")
+
+    return function_response_parts
 
 
 def main():
@@ -55,15 +78,7 @@ def main():
 
     # Configure the client and tools
     client = genai.Client(api_key=API_KEY)
-    tools = types.Tool(
-        # Available functions
-        function_declarations=[
-            schema_get_files_info,
-            schema_get_file_content,
-            schema_write_file,
-            schema_run_python_file,
-        ]
-    )
+    tools = function_schemas
     config=types.GenerateContentConfig(
         tools=[tools], system_instruction=SYSTEM_PROMPT
     )
@@ -76,7 +91,9 @@ def main():
 
     # Send request with function declarations
     response = get_response(client, config, contents)
-    print_report(response, user_prompt, is_verbose)
+
+    # Step 3: Execute the functions requested by the model and collect responses
+    get_function_response_parts(response, user_prompt, is_verbose)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 import os
-from dotenv import load_dotenv # type: ignore
+from dotenv import load_dotenv
 from functions.utils import root_dir
 
 
@@ -7,10 +7,10 @@ load_dotenv()
 MAX_CHAR_LIMIT = int(os.getenv("MAX_CHAR_LIMIT"))
 
 
-def get_file_content(directory, file_path):
+def get_file_content(working_directory, file_path):
     # Returns the contents of a file if it is within the root path; otherwise, returns an error message
     try:
-        full_path = os.path.join(root_dir(), directory, file_path)
+        full_path = os.path.join(root_dir(), working_directory, file_path)
         if not os.path.abspath(full_path).startswith(os.path.abspath(root_dir())):
             return f'Error: Cannot list "{file_path}" as it is outside the permitted working directory'
             # valid path but not from root directory
