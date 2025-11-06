@@ -11,7 +11,7 @@ load_dotenv()
 API_KEY = os.getenv("GEMINI_API_KEY")
 AI_MODEL = os.getenv("AI_MODEL")
 SYSTEM_PROMPT = os.getenv("SYSTEM_PROMPT")
-MAX_ITERATIONS = os.getenv("MAX_ITERATIONS")
+MAX_ITERATIONS = int(os.getenv("MAX_ITERATIONS"))
 
 
 if len(sys.argv) == 1:
@@ -73,6 +73,43 @@ def get_function_response_parts(
     return function_response_parts
 
 
+def run_agent_loop(
+    client: genai.Client,
+    config: types.GenerateContentConfig,
+    contents: list[types.Content],
+    user_prompt: str,
+    is_verbose: bool,
+) -> None:
+    """Run the agent loop to iteratively call the model and execute functions."""
+    for iteration in range(1, MAX_ITERATIONS + 1):
+        try:
+            # Call model with current conversation history
+            response = get_response(client, config, contents)
+
+            # Execute any function call returned by the model
+            function_response_parts = get_function_response_parts(response, user_prompt, is_verbose)
+
+            # Update conversation history
+            if function_response_parts:
+                contents.append(types.Content(
+                    role="user", 
+                    parts=function_response_parts
+                ))
+
+            # Model exits with answer; response will have text when function calls no longer needed
+            if not response.function_calls and response.text:
+                print("Final response:")
+                print(response.text)
+                return
+
+            # Model exists without answer; response text value will be None
+            if iteration == MAX_ITERATIONS:
+                print(f"Maximum iterations ({MAX_ITERATIONS}) reached without a final response.")
+
+        except Exception as e:
+            print(f"Error during iteration {iteration}: {e}")
+            break
+
 def main():
     # Step #1: Define a function declaration (done in functions.<file_names>.py)
     available_functions = function_schemas
@@ -93,14 +130,9 @@ def main():
         parts=[types.Part(text=user_prompt)],
     )]
 
-    # Send request with function declarations
-    response = get_response(client, config, contents)
-
     # Step 3: Execute the functions requested by the model and collect responses
-    function_response_parts = get_function_response_parts(response, user_prompt, is_verbose)
-
-    # Agent loop to handle iterative function calls
-    #run_agent_loop(client, config, contents, function_response_parts, is_verbose)
+    # Step 4: Create user friendly response with function result
+    run_agent_loop(client, config, contents, user_prompt, is_verbose)
 
 
 if __name__ == "__main__":
