@@ -74,20 +74,23 @@ def get_function_response_parts(
 
 def main():
     # Step #1: Define a function declaration (done in functions.<file_names>.py)
-    # Step #2: Call the model with function declarations
+    available_functions = function_schemas
 
+    # Step #2: Call the model with function declarations
     # Configure the client and tools
     client = genai.Client(api_key=API_KEY)
-    tools = function_schemas
+    tools = available_functions
     config=types.GenerateContentConfig(
-        tools=[tools], system_instruction=SYSTEM_PROMPT
+        tools=[tools], 
+        system_instruction=SYSTEM_PROMPT
     )
 
     # Define user prompt
     user_prompt, is_verbose = get_system_prompts()
-    contents = [
-        types.Content(role="user", parts=[types.Part(text=user_prompt)]),
-    ]
+    contents = [ types.Content(
+        role="user",
+        parts=[types.Part(text=user_prompt)],
+    )]
 
     # Send request with function declarations
     response = get_response(client, config, contents)
@@ -98,3 +101,37 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+"""
+Sample values for variables:
+
+> response
+types.GenerateContentResponse(
+  text=
+  function_calls=
+  usage_metadata=types.UsageMetadata(
+      prompt_token_count=###,
+      candidates_token_count=###,
+  ),
+)
+
+> tool_function_content
+types.Content(
+  role="tool",
+  parts=[
+    types.Part(
+      function_response=types.FunctionResponse(
+        name="get_files_info",
+        response={
+          "result": (
+            "- __init__.py: file_size=128 bytes, is_dir=False\n"
+            "- main.py: file_size=2048 bytes, is_dir=False\n"
+            "- utils.py: file_size=1920 bytes, is_dir=False"
+          )
+        }
+      )
+    )
+  ]
+)
+"""
