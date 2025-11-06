@@ -86,6 +86,12 @@ def run_agent_loop(
             # Call model with current conversation history
             response = get_response(client, config, contents)
 
+            # 🔍 Debug model output (optional)
+            if is_verbose:
+                print(f"\n[Iteration {iteration}]")
+                print(f"Model candidates: {response.candidates}")
+                print(f"Function calls: {response.function_calls}")
+
             # Execute any function call returned by the model
             function_response_parts = get_function_response_parts(response, user_prompt, is_verbose)
 
@@ -97,10 +103,12 @@ def run_agent_loop(
                 ))
 
             # Model exits with answer; response will have text when function calls no longer needed
-            if not response.function_calls and response.text:
-                print("Final response:")
-                print(response.text)
-                return
+            if not response.function_calls:
+                # Only stop if model produced a meaningful final message
+                if response.text and "```tool_outputs" not in response.text:
+                    print("Final response:")
+                    print(response.text)
+                    return
 
             # Model exists without answer; response text value will be None
             if iteration == MAX_ITERATIONS:
