@@ -11,6 +11,7 @@ load_dotenv()
 API_KEY = os.getenv("GEMINI_API_KEY")
 AI_MODEL = os.getenv("AI_MODEL")
 SYSTEM_PROMPT = os.getenv("SYSTEM_PROMPT")
+MAX_ITERATIONS = os.getenv("MAX_ITERATIONS")
 
 
 if len(sys.argv) == 1:
@@ -96,7 +97,10 @@ def main():
     response = get_response(client, config, contents)
 
     # Step 3: Execute the functions requested by the model and collect responses
-    get_function_response_parts(response, user_prompt, is_verbose)
+    function_response_parts = get_function_response_parts(response, user_prompt, is_verbose)
+
+    # Agent loop to handle iterative function calls
+    #run_agent_loop(client, config, contents, function_response_parts, is_verbose)
 
 
 if __name__ == "__main__":
