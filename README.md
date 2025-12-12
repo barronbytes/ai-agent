@@ -83,4 +83,4 @@ This project uses [function calling with Gemini API](https://ai.google.dev/gemin
 
 ## Credits and Contributing
 
-[Boot.dev](https://www.boot.dev) provided the project requirements and guidance to complete this project. Modifications were made to follow function calling guidance from Google. The [Google Gen AI SDK](https://googleapis.github.io/python-genai/) for Python was used as a source of truth for development.
+[Boot.dev](https://www.boot.dev) provided the project requirements and guidance to complete this project. Modifications were made to follow function calling guidance from Google. The [Google Gen AI SDK](https://googleapis.github.io/python-genai/) for Python was used as a source of truth for development. Contributions are welcome! Feel free to send a message for access to open an issue to report any problems.
