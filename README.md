@@ -62,7 +62,7 @@ MAX_ITERATIONS=20
 
 ### API Key Setup
 
-- Create an API Key on (Google AI Studio)[https://aistudio.google.com]
+- Create an API Key on [Google AI Studio](https://aistudio.google.com)
 - Store API Key on `.env` file variable
 - Add `.env` file to `.gitignore`
 
@@ -74,7 +74,7 @@ MAX_ITERATIONS=20
 
 <img src="./public/function-calling.PNG" width="60%">
 
-This project uses (function calling with Gemini API)[https://ai.google.dev/gemini-api/docs/function-calling?example=meeting] to create structured outputs. The overall workflow is shown in the image above and, at a high level, is decribed below:
+This project uses [function calling with Gemini API](https://ai.google.dev/gemini-api/docs/function-calling?example=meeting) to create structured outputs. The overall workflow is shown in the image above and, at a high level, is decribed below:
 
 - **User Prompt:** The user provides a prompt used for a request. The AI agent limits this to the working directory specified in the `.env` file.
 - **Function Calls:** The AI agent calls predefined functions to generate results.
@@ -83,4 +83,4 @@ This project uses (function calling with Gemini API)[https://ai.google.dev/gemin
 
 ## Credits and Contributing
 
-(Boot.dev)[https://www.boot.dev] provided the project requirements and guidance to complete this project. Modifications were made to follow function calling guidance from Google. The (Google Gen AI SDK)[https://googleapis.github.io/python-genai/] for Python was used as a source of truth for development.
+[Boot.dev](https://www.boot.dev) provided the project requirements and guidance to complete this project. Modifications were made to follow function calling guidance from Google. The [Google Gen AI SDK](https://googleapis.github.io/python-genai/) for Python was used as a source of truth for development.
