@@ -8,7 +8,16 @@ MAX_CHAR_LIMIT = int(os.getenv("MAX_CHAR_LIMIT"))
 
 
 def get_file_content(working_directory: str, file_path: str) -> str:
-    # Returns the contents of a file if it is within the root path; otherwise, returns an error message
+    """
+    Returns the truncated contents of a file if it is within the root path; otherwise, returns an error message.
+    A security check is enforced to prevent directory traversal outside the permitted root directory.
+
+    Args:
+        working_directory: The base directory where the file is located.
+        file_path: The path to the Python file, relative to the working directory.
+    Returns:
+        Output string for truncated filepath contents or error message.
+    """
     try:
         full_path = os.path.join(root_dir(), working_directory, file_path)
         if not os.path.abspath(full_path).startswith(os.path.abspath(root_dir())):
@@ -19,6 +28,6 @@ def get_file_content(working_directory: str, file_path: str) -> str:
             return f'Error: File not found or is not a regular file: "{file_path}"'
         with open(full_path, mode="r", encoding="utf-8") as f:
             content = f.read()
-            return content[:MAX_CHAR_LIMIT]  # truncate to limit
+            return content[:MAX_CHAR_LIMIT]  # Safeguard to truncate to limit (preserve tokens)
     except Exception as e:
         return f"Error: {str(e)}" # invalid file path provided, etc.    

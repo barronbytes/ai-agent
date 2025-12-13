@@ -4,7 +4,14 @@ from functions.utils import root_dir
 
 def get_files_info(working_directory: str, directory: str=".") -> str:
     """
-    Returns files with metadata at the path: root_dir() + working_directory + directory
+    Returns contents with metadata at the path: root_dir() + working_directory + directory
+    A security check is enforced to prevent directory traversal outside the permitted root directory.
+
+    Args:
+        working_directory: The base directory, relative to the root directory.
+        directory: The subdirectory, relative to the working directory; default value provided.
+    Returns:
+        Output string for filepath metadata or error message.
     """
     contents = []
     try:
