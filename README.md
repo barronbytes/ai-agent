@@ -58,21 +58,21 @@ GEMINI_API_KEY=""
 AI_MODEL="gemini-2.5-flash"
 MAX_CHAR_LIMIT=1000
 SYSTEM_PROMPT=""
-WORKING_DIR="./calculator"
+WORKING_DIR=""
 MAX_ITERATIONS=20
 ```
 
 ### API Key Setup
 
 - Create an API Key on [Google AI Studio](https://aistudio.google.com)
-- Store API Key on `.env` file variable
+- Store API Key inside `.env` file on the `GEMINI_API_KEY` environmental variable
 - Add `.env` file to `.gitignore`
 
 ## Usage
 
 ### Safeguards
 
-The program grants read _and_ write privileges to a codebase. This can be dangerous! As a safegaurd, the program's actions are limited to a single directory. The user defines this constraint as the `WORKING_DIR` environmental variable found inside the `.env` file. Additionally, users can set a value for `MAX_ITERATIONS` to prevent an infinite loop of function calls.
+The program grants read _and_ write privileges to a codebase. This can be dangerous! As a safegaurd, the program's actions are limited to a single directory. The user defines this constraint as the `WORKING_DIR` environmental variable found inside the `.env` file. Additionally, users can set values for `SYSTEM_PROMPT` to define AI agent behavior and `MAX_ITERATIONS` to prevent an infinite loop of function calls.
 
 ### User Prompts
 
