@@ -28,6 +28,17 @@ function_schemas = types.Tool(
 
 
 def call_function(function_call: types.FunctionCall, verbose: bool=False) -> types.Content:
+    '''
+    Executes function requested with Gemini model and returns a content object.
+    Security check to (1) determine if function exists in available function declarations and
+    (2) set "working_directory" argument value for available functions.
+    
+    Args:
+        function_call: Object containing function name and its arguments
+        verbose: Optional console argument
+    Returns:
+        Content object with role set to "tool" and result set to either function call output or error message.
+    '''
     if verbose:
         print(f"Calling function: {function_call.name}({function_call.args})")
     else:
@@ -38,6 +49,7 @@ def call_function(function_call: types.FunctionCall, verbose: bool=False) -> typ
 
     # Unsuccessful function call
     if function_name not in map_to_function:
+        # Content object created with role "tool" for function call to store default error message
         tool_function_content = types.Content(
             role="tool",
             parts=[
@@ -49,16 +61,20 @@ def call_function(function_call: types.FunctionCall, verbose: bool=False) -> typ
         )
     # Successful function call
     else:
-        # Security measure to set working directory
+        # Safeguard to set working directory
         args = dict(function_call.args)
         args["working_directory"] = WORKING_DIR
-        tool_function = map_to_function[function_name](**args)
+
+        # Call the actual Python function with unpacked arguments -> function output
+        tool_function_output = map_to_function[function_name](**args)
+
+        # Content object created with role "tool" for function call to store actual function call output
         tool_function_content = types.Content(
             role="tool",
             parts=[
                 types.Part.from_function_response(
                     name=function_name,
-                    response={"result": tool_function},
+                    response={"result": tool_function_output},
                 )
             ]
         )
