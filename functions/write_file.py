@@ -3,6 +3,18 @@ from functions.utils import root_dir
 
 
 def write_file(working_directory: str, file_path: str, content: str) -> str:
+    '''
+    Writes content to a file relative to a working directory, automatically creating parent directories
+    if neccessary and overwritting files if already present. A security check is enforced to prevent
+    directory traversal outside the permitted root directory.
+
+    Args:
+        working_directory: The base directory where the file is located.
+        file_path: The path to the Python file, relative to the working directory.
+        content: The string content to be written to the file.
+    Returns:
+        Output string for success or error message.
+    '''
     try:
         full_path = os.path.join(root_dir(), working_directory, file_path)
         # Safeguard against directory traversal
