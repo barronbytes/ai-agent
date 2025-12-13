@@ -4,7 +4,7 @@ This project uses a pre-trained LLM to create an AI agent that assists with codi
 
 **Project Demo:**
 
-...
+![Demonstration of using program to inspect files in a directory.](./public/ai-agent-demo.gif)
 
 ## Tech Stack
 
@@ -70,7 +70,17 @@ MAX_ITERATIONS=20
 
 ## Usage
 
-...
+### Safeguards
+
+The program grants read _and_ write privileges to a codebase. This can be dangerous! As a safegaurd, the program's actions are limited to a single directory. The user defines this constraint as the `WORKING_DIR` environmental variable found inside the `.env` file. Additionally, users can set a value for `MAX_ITERATIONS` to prevent an infinite loop of function calls.
+
+### User Prompts
+
+After the virtual environment has been activated, users should use the following prompt format:
+
+> `python main.py 'ENTER YOUR PROMPT HERE' --verbose`
+
+The program will throw an error if a prompt is not entered after the program file name. Optionally, users can use a `--verbose` statement in the prompt for the response to report token input and output metadata.
 
 ## Development Roadmap
 

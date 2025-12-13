@@ -133,7 +133,7 @@ def main():
 
     # Define user prompt
     user_prompt, is_verbose = get_system_prompts()
-    contents = [ types.Content(
+    contents = [types.Content(
         role="user",
         parts=[types.Part(text=user_prompt)],
     )]
@@ -141,7 +141,6 @@ def main():
     # Step 3: Execute the functions requested by the model and collect responses
     # Step 4: Create user friendly response with function result
     run_agent_loop(client, config, contents, user_prompt, is_verbose)
-    client.close()
 
 
 if __name__ == "__main__":
