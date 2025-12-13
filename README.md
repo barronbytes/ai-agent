@@ -49,7 +49,7 @@ This repo will later be, if not already, saved as a subfolder. Be sure to only c
 - Use uv's project environment and avoid pyenv/global mismatches: `uv add requests && uv run python main.py`
 - Activate virtual environment: `source .venv/bin/activate`
 
-### Environmental Variables
+### Environmental Variables Setup
 
 Create a `.env` file with the following contents:
 
