@@ -119,7 +119,9 @@ def run_agent_loop(
             break
 
 def main():
-    # Step #1: Define a function declaration (done in functions.<file_names>.py)
+    # Step #1: Define function declarations
+    # Schemas written in functions.schemas
+    # types.Tool() object created in functions.call_function
     available_functions = function_schemas
 
     # Step #2: Call the model with function declarations
