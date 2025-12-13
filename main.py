@@ -141,6 +141,7 @@ def main():
     # Step 3: Execute the functions requested by the model and collect responses
     # Step 4: Create user friendly response with function result
     run_agent_loop(client, config, contents, user_prompt, is_verbose)
+    client.close()
 
 
 if __name__ == "__main__":

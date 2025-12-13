@@ -34,6 +34,8 @@ ai-agent/
 
 # Install dependencies
 - uv project/package manager > docs.astral.sh/uv/getting-started/installation/
+- Environmental variables > uv add python-dotenv==1.1.0
+- Google Gemini API > uv add google-genai==1.12.1
 ```
 
 ## Quick Start
@@ -83,4 +85,4 @@ This project uses [function calling with Gemini API](https://ai.google.dev/gemin
 
 ## Credits and Contributing
 
-[Boot.dev](https://www.boot.dev) provided the project requirements and guidance to complete this project. Modifications were made to follow function calling guidance from Google. The [Google Gen AI SDK](https://googleapis.github.io/python-genai/) for Python was used as a source of truth for development. Contributions are welcome! Feel free to send a message for access to open an issue to report any problems.
+[Boot.dev](https://www.boot.dev) provided the project requirements and guidance to complete this project. Modifications were made to follow [function calling guidance from Google](https://ai.google.dev/gemini-api/docs/function-calling?example=meeting). The [Google Gen AI SDK](https://googleapis.github.io/python-genai/) for Python was used as a source of truth for development. Contributions are welcome! Feel free to report any problems.
