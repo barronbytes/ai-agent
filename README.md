@@ -115,18 +115,20 @@ The program will throw an error if a prompt is not entered after the program fil
 
 **Model Call:**
 
-> call_model(
->     model_settings,
->     conversation_history
-> ) -> model_response (result | function_calls | error)
+> call_model(<br>
+>     model_settings,<br>
+>     conversation_history<br>
+> ) -> model_response ( result | function_calls | error )
 
 **Function Calls:**
 
-> call_function(
->     function_name,
->     arguments,
->     WORKING_DIR
-> ) -> function_response (result | error)
+> call_function(<br>
+>     function_name,<br>
+>     arguments,<br>
+>     WORKING_DIR<br>
+> ) -> function_response ( result | error )
+
+_In reality, several function call files were written. However, each generally follows this convention._
 
 ### 4. Data Flow
 
