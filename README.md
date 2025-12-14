@@ -145,6 +145,13 @@ I created the diagram above to illustrate [function calling with Gemini API](htt
 
 Safeguards taken throughout this project included: (1) safely storing API keys; (2) limiting read-write privileges to a single directory; (3) protecting against directory traversal; (4) limiting output to preserve tokens; (5) using timeout limits when running subprocesses; and (6) setting an iteration limit to avoid infite model + function execution loops. Error handling was used, but did not cover all edge cases.
 
+### High Level Design
+
+The project currently reprsents a **single-node, agent-driven architecture** without a frontend, backend server, or database. The project could be improved to be more robust in the following manner:
+
+1. **Client:** Use HTML and JavaScript to create an **asynchronous** web application using **WebSockets** over a TCP connection. This will allow the UI to provide a real-time log of the agent's thought process after a user submits a prompt and waits for a response.
+2. **API Gateway:** This is the single, centralized entry point and security perimeter to the backend services. **Security benefits** include handling authentication/authorization and rate limiting. **Scalability benfits** include horizontal load balancing and service routing.
+
 ## Credits and Contributing
 
 [Boot.dev](https://www.boot.dev) provided the project requirements and guidance to complete this project. Modifications were made to follow [function calling guidance from Google](https://ai.google.dev/gemini-api/docs/function-calling?example=meeting). The [Google Gen AI SDK](https://googleapis.github.io/python-genai/) for Python was used as a source of truth for development. Contributions are welcome! Feel free to report any problems.
