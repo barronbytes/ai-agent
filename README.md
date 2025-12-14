@@ -145,12 +145,14 @@ I created the diagram above to illustrate [function calling with Gemini API](htt
 
 Safeguards taken throughout this project included: (1) safely storing API keys; (2) limiting read-write privileges to a single directory; (3) protecting against directory traversal; (4) limiting output to preserve tokens; (5) using timeout limits when running subprocesses; and (6) setting an iteration limit to avoid infite model + function execution loops. Error handling was used, but did not cover all edge cases.
 
-### High Level Design
+### 5. High Level Design
 
 The project currently reprsents a **single-node, agent-driven architecture** without a frontend, backend server, or database. The project could be improved to be more robust in the following manner:
 
 1. **Client:** Use HTML and JavaScript to create an **asynchronous** web application using **WebSockets** over a TCP connection. This will allow the UI to provide a real-time log of the agent's thought process after a user submits a prompt and waits for a response.
-2. **API Gateway:** This is the single, centralized entry point and security perimeter to the backend services. **Security benefits** include handling authentication/authorization and rate limiting. **Scalability benfits** include horizontal load balancing and service routing.
+2. **API Gateway:** This is the single, centralized entry point and security perimeter to the backend services. **Security benefits** include handling authentication/authorization and rate limiting. **Scalability benefits** include horizontal load balancing and service routing.
+3. **Server (Agent Orchestration):** This service runs the core agent logic (planningn and action loop). Can be implemented as a **stateless microservice** that passes user requests to an **asynchronous task queue** (e.g., Redis or Kafka). This would allow for horizontal scaling and improved client response times by allowing tasks to execute independently.
+4. **Database:** May use two database types. **Relational database** may store user account information and system logs. **Vector database** may store embeddings of conversation history for retrieval-augmented generation **(RAG)**.
 
 ## Credits and Contributing
 
