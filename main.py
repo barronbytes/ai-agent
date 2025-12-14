@@ -55,8 +55,8 @@ def get_function_response_parts(
         print("Response:")
         print(response.text)
     else:
-        # Function execution
         for function_call in response.function_calls:
+            # 3 Helper: call function
             tool_function_content = call_function(function_call, is_verbose)
         
             if not tool_function_content.parts or not tool_function_content.parts[0].function_response:
@@ -65,7 +65,7 @@ def get_function_response_parts(
             if is_verbose:
                 print(f"-> {tool_function_content.parts[0].function_response.response}")
 
-            # Function execution results
+            # 4 Helper: parse function response for parts
             function_response_parts.append(tool_function_content.parts[0])
         if not function_response_parts:
             raise Exception("No function responses generated, exiting.")
@@ -83,7 +83,7 @@ def run_agent_loop(
     """Run the agent loop to iteratively call the model and execute functions."""
     for iteration in range(1, MAX_ITERATIONS + 1):
         try:
-            # Call model with current conversation history
+            # 2 & 4 Helper: call model with current conversation history
             response = get_response(client, config, contents)
 
             # 🔍 Debug model output (optional)
@@ -92,17 +92,17 @@ def run_agent_loop(
                 print(f"Model candidates: {response.candidates}")
                 print(f"Function calls: {response.function_calls}")
 
-            # Execute any function call returned by the model
+            # 3 & 4 Helper: call function and extract function parts
             function_response_parts = get_function_response_parts(response, user_prompt, is_verbose)
 
-            # Update conversation history
+            # 4 Helper: update conversation history
             if function_response_parts:
                 contents.append(types.Content(
                     role="user", 
                     parts=function_response_parts
                 ))
 
-            # Model exits with answer; response will have text when function calls no longer needed
+            # 4 Helper: model exits with answer; response will have text when function calls no longer needed
             if not response.function_calls:
                 # Only stop if model produced a meaningful final message
                 if response.text and "```tool_outputs" not in response.text:
@@ -110,7 +110,7 @@ def run_agent_loop(
                     print(response.text)
                     return
 
-            # Model exists without answer; response text value will be None
+            # 4 Helper: model exists without answer; response text value will be None
             if iteration == MAX_ITERATIONS:
                 print(f"Maximum iterations ({MAX_ITERATIONS}) reached without a final response.")
 
@@ -120,28 +120,31 @@ def run_agent_loop(
 
 def main():
     # Step #1: Define function declarations
-    # Schemas written in functions.schemas
-    # types.Tool() object created in functions.call_function
+
+    # Schemas written in functions.schemas and bunled into types.Tool() object in functions.call_function
     available_functions = function_schemas
 
-    # Step #2: Call the model with function declarations
-    # Configure the client and tools
+    # Step #2: Call the Gemini model
+
+    # 2a. Configure the client and model behavior
     client = genai.Client(api_key=API_KEY)
     tools = available_functions
-    config=types.GenerateContentConfig(
+    config = types.GenerateContentConfig(
         tools=[tools], 
         system_instruction=SYSTEM_PROMPT
     )
 
-    # Define user prompt
+    # 2b. Define user prompt and initial conversation history
     user_prompt, is_verbose = get_system_prompts()
     contents = [types.Content(
         role="user",
         parts=[types.Part(text=user_prompt)],
     )]
 
-    # Step 3: Execute the functions requested by the model and collect responses
-    # Step 4: Create user friendly response with function result
+    # The agent enters an iterative loop (limited by MAX_ITERATIONS) where:
+    # Step 2c: Execute model -> model response
+    # Step 3: Execute function -> function response
+    # Step 4: Execute model again -> repeat 2 & 3 for final model response
     run_agent_loop(client, config, contents, user_prompt, is_verbose)
 
 
