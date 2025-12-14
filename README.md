@@ -62,6 +62,8 @@ WORKING_DIR=""
 MAX_ITERATIONS=20
 ```
 
+This project used Google Gemini 2.5 Flash. At the time of this writing a free tier existed. Regardless of the AI provider you choose, you should set values for each variable shown.
+
 ### API Key Setup
 
 - Create an API Key on [Google AI Studio](https://aistudio.google.com)
@@ -72,7 +74,9 @@ MAX_ITERATIONS=20
 
 ### Safeguards
 
-The program grants read _and_ write privileges to a codebase. This can be dangerous! As a safegaurd, the program's actions are limited to a single directory. The user defines this constraint as the `WORKING_DIR` environmental variable found inside the `.env` file. Additionally, users can set values for `SYSTEM_PROMPT` to define AI agent behavior and `MAX_ITERATIONS` to prevent an infinite loop of function calls.
+The program grants read _and_ write privileges to a codebase. This can be dangerous! Safeguards taken throughout this project included: (1) safely storing API keys; (2) limiting read-write privileges to a single directory; (3) protecting against directory traversal; (4) using timeout limits when running subprocesses; (5) setting an iteration limit to avoid infite agent call loops; and (6) setting a character limit for output to preserve tokens. Error handling was used, but did not cover all edge cases. 
+
+Safegaurds (1), (2), (5), and (6) are implemented via environmental variables in the the `.env` file, which the `.gitignore` file then protects from public exposure. Safeguards (3) and (4) are implemented via files in the `./functions/` folder.
 
 ### User Prompts
 
@@ -115,18 +119,11 @@ The program will throw an error if a prompt is not entered after the program fil
 
 **Model Call:**
 
-> call_model(
->     model_settings,
->     conversation_history
-> ) -> model_response ( result | function_calls | error )
+> `call_model(model_settings, conversation_history) -> model_response(result | function_calls | error)`
 
 **Function Calls:**
 
-> call_function(
->     function_name,
->     arguments,
->     WORKING_DIR
-> ) -> function_response ( result | error )
+> `call_function(function_name, arguments, WORKING_DIR) -> function_response (result | error)`
 
 _In reality, several function call files were written. However, each generally follows this convention._
 
@@ -136,14 +133,12 @@ _In reality, several function call files were written. However, each generally f
 
 I created the diagram above to illustrate [function calling with Gemini API](https://ai.google.dev/gemini-api/docs/function-calling?example=meeting). The four numbers shown correspond with the article steps outlined, which are used throughout this project for developer documentation. The overall workflow follows this order and is expanded upon in a table below:
 
-1. **Model Settings:** Model settings are set with combination of user prompt, `GEMINI_API_KEY`, `AI_MODEL`, `SYSTEM_PROMPT`, and function declarations. The user prompt is entered in the terminal. Environmental variable are written in the `.env` file and hidden via `.gitignore` file inclusion.
-2. **Call Model:** The Gemini model is executed. The model response may contain function calls along with arguments. Call limit set by `MAX_ITERATIONS` environmental variable.
-3. **Call Functions:** Functions are executed and the conversation history is updated. Scope of function calls limited by `WORKING_DIR`.
-4. **Model Response:** Steps 2 and 3 repeat. Final model response is formatted. Output limited by `MAX_CHAR_LIMIT`.
+1. **Function Declarations:** The `./functions/schemas.py` file defined all external functions to be used by the model. The `./functions/call_function.py` file bundled these functions into a `types.Tool()` object.
+2. **Call Model:** The Gemini model is executed. This requires providing the model settings: `GEMINI_API_KEY`, `AI_MODEL`, `SYSTEM_PROMPT`, user prompt, conversation history, and function declarations.
+3. **Call Functions:** Function calls are executed. This requires parsing the model response from step (2) to determine function names and arguments to call. The `WORKING_DIR` must be provided on each function call.
+4. **Model Response:** The Gemini model is executed again within an agent loop that repeats steps (2) and (3). At the end of each cycle, the function response is parsed for content to update the conversation history. The agent loop runs at most for `MAX_ITERATIONS` and final output has a character limitation of `MAX_CHAR_LIMIT` to preserve tokens.
 
 <img src="./public/function-calling-table.PNG" width="80%">
-
-Safeguards taken throughout this project included: (1) safely storing API keys; (2) limiting read-write privileges to a single directory; (3) protecting against directory traversal; (4) limiting output to preserve tokens; (5) using timeout limits when running subprocesses; and (6) setting an iteration limit to avoid infite model + function execution loops. Error handling was used, but did not cover all edge cases.
 
 ### 5. High Level Design
 
