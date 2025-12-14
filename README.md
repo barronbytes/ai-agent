@@ -1,6 +1,6 @@
 # AI Agent
 
-This project uses a pre-trained LLM to create an AI agent that assists with coding tasks. Users can provide command-line instructions for the program to analyze a codebae, identify issues, and apply corrections.
+This project uses a pre-trained LLM to create an AI agent that assists with coding tasks. Users can provide command-line instructions for the program to analyze a codebase, identify issues, and apply corrections.
 
 **Project Demo:**
 
