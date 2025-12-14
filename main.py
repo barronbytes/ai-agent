@@ -31,12 +31,12 @@ def get_system_prompts() -> tuple[str, bool]:
 def get_response(
     client: genai.Client, 
     config: types.GenerateContentConfig, 
-    contents: list[types.Content]
+    conversation_history: list[types.Content]
 ) -> types.GenerateContentResponse:
     return client.models.generate_content(
         model=AI_MODEL,
         config=config,
-        contents=contents,
+        contents=conversation_history,
     )
 
 
@@ -76,7 +76,7 @@ def get_function_response_parts(
 def run_agent_loop(
     client: genai.Client,
     config: types.GenerateContentConfig,
-    contents: list[types.Content],
+    conversation_history: list[types.Content],
     user_prompt: str,
     is_verbose: bool,
 ) -> None:
@@ -84,7 +84,7 @@ def run_agent_loop(
     for iteration in range(1, MAX_ITERATIONS + 1):
         try:
             # 2 & 4 Helper: call model with current conversation history
-            response = get_response(client, config, contents)
+            response = get_response(client, config, conversation_history)
 
             # 🔍 Debug model output (optional)
             if is_verbose:
@@ -97,7 +97,7 @@ def run_agent_loop(
 
             # 4 Helper: update conversation history
             if function_response_parts:
-                contents.append(types.Content(
+                conversation_history.append(types.Content(
                     role="user", 
                     parts=function_response_parts
                 ))
@@ -136,7 +136,7 @@ def main():
 
     # 2b. Define user prompt and initial conversation history
     user_prompt, is_verbose = get_system_prompts()
-    contents = [types.Content(
+    conversation_history = [types.Content(
         role="user",
         parts=[types.Part(text=user_prompt)],
     )]
@@ -145,7 +145,7 @@ def main():
     # Step 2c: Execute model -> model response
     # Step 3: Execute function -> function response
     # Step 4: Execute model again -> repeat 2 & 3 for final model response
-    run_agent_loop(client, config, contents, user_prompt, is_verbose)
+    run_agent_loop(client, config, conversation_history, user_prompt, is_verbose)
 
 
 if __name__ == "__main__":

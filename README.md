@@ -78,20 +78,66 @@ The program grants read _and_ write privileges to a codebase. This can be danger
 
 After the virtual environment has been activated, users should use the following prompt format:
 
-> `python main.py 'ENTER YOUR PROMPT HERE' --verbose`
+> `python main.py 'ENTER YOUR PROMPT HERE' [--verbose]`
 
 The program will throw an error if a prompt is not entered after the program file name. Optionally, users can use a `--verbose` statement in the prompt for the response to report token input and output metadata.
 
-## High-Level Overview
+## System Design
+
+### 1. Requirements
+
+**Functional Requirements:**
+
+- User submits a **user_prompt** in command-line interface (CLI)
+- For a single `WORKING_DIRECTORY`, the AI agent can inspect files, read contents, write changes, and execute Python files
+- Program ends with model response that satisfies initial prompt
+
+**Optional Requirements:**
+
+- **Verbose mode:** if user ends initial prompt with `--verbose` tag for model response to include additional metadata
+- Low latency: use timeout limits when running subprocesses
+- Scalability: limiting output character length to preserve tokens (`MAX_CHAR_LIMIT` in `.env` file)
+- Security: (1) safely storing API keys (`GEMINI_API_KEY` in `.env` file); (2) limit read-write privileges to a single directory (`WORKING_DIRECTORY` in `.env` file); (3) protecting against directory traversal (conditional checks in `./functions/` files); (4) setting an iteration limit to avoid infite model + function execution loops (`MAX_ITERATIONS` in `.env` file)
+- CAP Theorem: prioritize consistency (read/writes must be correct) over availability
+
+### 2. Core Entities
+
+- **UserPrompt:** user_prompt (string), is_verbose (boolean)
+- **ModelSettings:** GEMINI_API_KEY, AI_MODEL, SYSTEM_PROMPT, available_functions (function schemas), conversation_history (content messages)
+- **ModelCalls:** MAX_ITERATIONS, current_iteration, model_response
+- **FunctionCalls:** WORKING_DIR, function_name, arguments, function_response
+
+### 3. API (or Interface)
+
+**Command-Line Interface (CLI):**
+
+> `python main.py 'user_prompt' [--verbose]`
+
+**Model Call:**
+
+> call_model(
+>     model_settings,
+>     conversation_history
+> ) -> model_response (result | function_calls | error)
+
+**Function Calls:**
+
+> call_function(
+>     function_name,
+>     arguments,
+>     WORKING_DIR
+> ) -> function_response (result | error)
+
+### 4. Data Flow
 
 <img src="./public/function-calling-diagram.PNG" width="80%">
 
 I created the diagram above to illustrate [function calling with Gemini API](https://ai.google.dev/gemini-api/docs/function-calling?example=meeting). The four numbers shown correspond with the article steps outlined, which are used throughout this project for developer documentation. The overall workflow follows this order and is expanded upon in a table below:
 
-1. **Model Settings:** Model settings are set with combination of user prompt, system prompt, and function declarations. The user prompt is entered in the terminal. The system prompt is defined as an environmental variable.
-2. **Call Model:** The Gemini model is executed. The model response may contain function calls along with arguments.
-3. **Call Functions:** Functions are executed and the conversation history is updated.
-4. **Model Response:** Steps 2 and 3 repeat. Final model response is formatted.
+1. **Model Settings:** Model settings are set with combination of user prompt, `GEMINI_API_KEY`, `AI_MODEL`, `SYSTEM_PROMPT`, and function declarations. The user prompt is entered in the terminal. Environmental variable are written in the `.env` file and hidden via `.gitignore` file inclusion.
+2. **Call Model:** The Gemini model is executed. The model response may contain function calls along with arguments. Call limit set by `MAX_ITERATIONS` environmental variable.
+3. **Call Functions:** Functions are executed and the conversation history is updated. Scope of function calls limited by `WORKING_DIR`.
+4. **Model Response:** Steps 2 and 3 repeat. Final model response is formatted. Output limited by `MAX_CHAR_LIMIT`.
 
 <img src="./public/function-calling-table.PNG" width="80%">
 
