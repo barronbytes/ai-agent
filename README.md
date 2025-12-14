@@ -82,16 +82,20 @@ After the virtual environment has been activated, users should use the following
 
 The program will throw an error if a prompt is not entered after the program file name. Optionally, users can use a `--verbose` statement in the prompt for the response to report token input and output metadata.
 
-## Development Roadmap
+## High-Level Overview
 
-<img src="./public/function-calling.PNG" width="60%">
+<img src="./public/function-calling-diagram.PNG" width="80%">
 
-This project uses [function calling with Gemini API](https://ai.google.dev/gemini-api/docs/function-calling?example=meeting) to create structured outputs. The overall workflow is shown in the image above and, at a high level, is decribed below:
+I created the diagram above to illustrate [function calling with Gemini API](https://ai.google.dev/gemini-api/docs/function-calling?example=meeting). The four numbers shown correspond with the article steps outlined, which are used throughout this project for developer documentation. The overall workflow follows this order and is expanded upon in a table below:
 
-- **User Prompt:** The user provides a prompt used for a request. The AI agent limits this to the working directory specified in the `.env` file.
-- **Function Calls:** The AI agent calls predefined functions to generate results.
-- **Iteration:** The LLM  evaluates results and determines if additional function calls are necessary before creating a final response.
-- **Final Output:** The AI agent returns a formatted summary. This can include metadeta and logs of functions called in addition to the final response.
+1. **Model Settings:** Model settings are set with combination of user prompt, system prompt, and function declarations. The user prompt is entered in the terminal. The system prompt is defined as an environmental variable.
+2. **Call Model:** The Gemini model is executed. The model response may contain function calls along with arguments.
+3. **Call Functions:** Functions are executed and the conversation history is updated.
+4. **Model Response:** Steps 2 and 3 repeat. Final model response is formatted.
+
+<img src="./public/function-calling-table.PNG" width="80%">
+
+Safeguards taken throughout this project included: (1) safely storing API keys; (2) limiting read-write privileges to a single directory; (3) protecting against directory traversal; (4) limiting output to preserve tokens; (5) using timeout limits when running subprocesses; and (6) setting an iteration limit to avoid infite model + function execution loops. Error handling was used, but did not cover all edge cases.
 
 ## Credits and Contributing
 
