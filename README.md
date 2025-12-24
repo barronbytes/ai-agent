@@ -4,7 +4,7 @@ This project uses a pre-trained LLM to create an AI agent that assists with codi
 
 **Project Demo:**
 
-<img src="./public/ai-agent-demo.gif" alt="Demonstration of using program to inspect files in a directory." width="80%">
+<img src="./public/ai-agent-demo.gif" alt="Demonstration of using program to inspect files in a directory." width="100%">
 
 ## Tech Stack
 
