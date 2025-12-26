@@ -19,19 +19,39 @@ try:
     with open(LOG_FILE, "r", encoding="utf-8") as f:
         data = json.load(f)
         today = datetime.now().date()
+        # --- Daily usage data ---
         _daily_request_log = [
-            datetime.fromisoformat(ts) for ts in data.get("daily", [])
+            datetime.fromisoformat(ts) for ts in data.get("daily_requests", [])
             if datetime.fromisoformat(ts).date() == today
+        ]
+        # --- Minute usage data ---
+        one_minute_ago = datetime.now() - timedelta(minutes=1)
+        _minute_request_log = [
+            datetime.fromisoformat(ts) for ts in data.get("minute_requests", [])
+            if datetime.fromisoformat(ts).date() > one_minute_ago
+        ]
+        _minute_input_token_log = [
+            (datetime.fromisoformat(ts), tokens)
+            for ts, tokens in data.get("minute_tokens", [])
+            if datetime.fromisoformat(ts).date() > one_minute_ago
         ]
 except FileNotFoundError:
     _daily_request_log = []
+    _minute_request_log = []
+    _minute_input_token_log = []
 except Exception:
     _daily_request_log = []
+    _minute_request_log = []
+    _minute_input_token_log = []
 
 
-def _save_daily_log():
+def _save_logs():
     """Save the daily requests for persistence."""
-    data = {"daily": [dt.isoformat() for dt in _daily_request_log]}
+    data = {
+        "daily_requests": [dt.isoformat() for dt in _daily_request_log],
+        "minute_requests": [dt.isoformat() for dt in _minute_request_log],
+        "minute_tokens": [(dt.isoformat(), tokens) for dt, tokens in _minute_input_token_log],
+    }
     with open(LOG_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f)
 
@@ -72,7 +92,7 @@ def log_request(input_tokens: int) -> None:
     _daily_request_log[:] = [dt for dt in _daily_request_log if dt.date() == today]
 
     # --- Save to daily log ---
-    _save_daily_log()
+    _save_logs()
 
 
 def get_rpd() -> int:
