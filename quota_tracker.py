@@ -18,7 +18,7 @@ def log_request(input_tokens: int) -> None:
     Args:
         input_tokens: The input tokens from a successful request to AI model.
     Returns:
-        Not applicable. Function simply prints information to console.
+        Not applicable.
     '''
     date_time = datetime.now()
 
@@ -40,12 +40,15 @@ def log_request(input_tokens: int) -> None:
 
 
 def get_rpm() -> int:
+    """Return number of requests in the last 60 seconds."""
     return len(_minute_request_log)
 
 
 def get_tpm() -> int:
+    """Return number of input tokens in the last 60 seconds."""
     return sum(tokens for dt, tokens in _minute_input_token_log)
 
 
 def get_rpd() -> int:
+    """Return number of requests in the same day."""
     return len(_daily_request_log)
