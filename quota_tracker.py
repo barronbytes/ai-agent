@@ -55,15 +55,15 @@ def get_tpm() -> int:
 
 
 def threshold_rpd() -> int:
-    """Return threshold limit for RPD"""
+    """Return threshold limit for requests per day (RPD)."""
     return 20
 
 
 def threshold_rpm() -> int:
-    """Return threshold limit for RPM"""
+    """Return threshold limit for requests per minute (RPM)."""
     return 5
 
 
 def threshold_tpm() -> int:
-    """Return threshold limit for TPM"""
+    """Return threshold limit for input tokens per minute (TPM)."""
     return 250000
