@@ -17,7 +17,7 @@ MAX_ITERATIONS = int(os.getenv("MAX_ITERATIONS"))
 
 if len(sys.argv) == 1:
     print("Error: No prompt argument provided.")
-    print("Usage: python main.py 'your prompt here'")
+    print("Usage: python main.py 'your prompt here' [--verbose]")
     print("Example: python main.py 'How do I build a calculator app?'")
     sys.exit(1)
 
