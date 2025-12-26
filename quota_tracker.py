@@ -29,14 +29,19 @@ def log_request(input_tokens: int) -> None:
     # Log for daily metrics
     _daily_request_log.append(date_time)
 
+    # Remove entries older than one day (for RPD)
+    today = date_time.date()
+    _daily_request_log[:] = [dt for dt in _daily_request_log if dt.date() == today]
+
     # Remove entries older than one minute (for RPM and TPM)
     one_minute_ago = date_time - timedelta(minutes=1)
     _minute_request_log[:] = [dt for dt in _minute_request_log if dt > one_minute_ago]
     _minute_input_token_log[:] = [(dt, tokens) for dt, tokens in _minute_input_token_log if dt > one_minute_ago]
 
-    # Remove entries older than one day (for RPD)
-    today = date_time.date()
-    _daily_request_log[:] = [dt for dt in _daily_request_log if dt.date() == today]
+
+def get_rpd() -> int:
+    """Return number of requests in the same day."""
+    return len(_daily_request_log)
 
 
 def get_rpm() -> int:
@@ -49,6 +54,16 @@ def get_tpm() -> int:
     return sum(tokens for dt, tokens in _minute_input_token_log)
 
 
-def get_rpd() -> int:
-    """Return number of requests in the same day."""
-    return len(_daily_request_log)
+def threshold_rpd() -> int:
+    """Return threshold limit for RPM"""
+    return 20
+
+
+def threshold_rpm() -> int:
+    """Return threshold limit for RPM"""
+    return 5
+
+
+def threshold_tpm() -> int:
+    """Return threshold limit for RPM"""
+    return 250000

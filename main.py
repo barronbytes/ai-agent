@@ -3,6 +3,7 @@ import os # interact with operating system → files, directories, environmental
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
+from quota_tracker import *
 from functions.schemas import *
 from functions.call_function import function_schemas, call_function
 
@@ -49,6 +50,14 @@ def get_function_response_parts(
         print(f"User prompt: {user_prompt}")
         print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
         print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
+
+    # Log request metrics for quota tracking
+    log_request(response.usage_metadata.prompt_token_count)
+    
+    if is_verbose:
+        print(f"Requests per day (RPD): used {get_rpd} out of {threshold_rpd}")
+        print(f"Requests per minute (RPM): used {get_rpm} out of {threshold_rpm}")
+        print(f"Tokens per minute (RPM): used {get_tpm} out of {threshold_tpm}")
 
     function_response_parts: list[types.Part] = []
     if not response.function_calls:
