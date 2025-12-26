@@ -59,7 +59,7 @@ AI_MODEL="gemini-2.5-flash"
 MAX_CHAR_LIMIT=1000
 SYSTEM_PROMPT=""
 WORKING_DIR=""
-MAX_ITERATIONS=20
+MAX_ITERATIONS=5
 ```
 
 This project used Google Gemini 2.5 Flash. At the time of this writing a free tier existed. Regardless of the AI provider you choose, you should set values for each variable shown.
