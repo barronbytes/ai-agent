@@ -28,12 +28,12 @@ try:
         one_minute_ago = datetime.now() - timedelta(minutes=1)
         _minute_request_log = [
             datetime.fromisoformat(ts) for ts in data.get("minute_requests", [])
-            if datetime.fromisoformat(ts).date() > one_minute_ago
+            if datetime.fromisoformat(ts) > one_minute_ago
         ]
         _minute_input_token_log = [
             (datetime.fromisoformat(ts), tokens)
             for ts, tokens in data.get("minute_tokens", [])
-            if datetime.fromisoformat(ts).date() > one_minute_ago
+            if datetime.fromisoformat(ts) > one_minute_ago
         ]
 except FileNotFoundError:
     _daily_request_log = []
