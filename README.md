@@ -9,7 +9,7 @@ This project uses a pre-trained LLM to create an AI agent that assists with codi
 ## Tech Stack
 
 * **Frontend:** n/a
-* **Backend:** Python, Google Gemini 2.5 Flash
+* **Backend:** Python, Google Gemini 2.5 Flash, JSON (for API usage logging)
 
 ## Project Structure
 
@@ -22,6 +22,9 @@ ai-agent/
 ├── functions/                  # Contains files with helper functions for AI agent to
 ├── .gitignore                  # Git ignore rules
 ├── .env                        # Environmental variables
+├── main.py                     # Entry point for CLI agent
+├── quota_tracker.py            # Tracks API usage and persists logs
+├── quota_log.json              # JSON file persisting daily and minute usage logs
 ├── main.py                     # Entry point for CLI agent
 ├── tests.py                    # Test scripts for call functions
 ├── pyproject.toml              # Project configuration and dependencies
@@ -62,7 +65,7 @@ WORKING_DIR=""
 MAX_ITERATIONS=5
 ```
 
-This project used Google Gemini 2.5 Flash. At the time of this writing a free tier existed. Regardless of the AI provider you choose, you should set values for each variable shown.
+This project used Google Gemini 2.5 Flash. At the time of this writing a free tier existed. Regardless of the AI provider you choose, you should set values for each variable shown. Since the **requests per minute (RPM)** was 5 for the agent chosen, the value for `MAX_ITERATIONS` was set to this value.
 
 ### API Key Setup
 
@@ -72,12 +75,6 @@ This project used Google Gemini 2.5 Flash. At the time of this writing a free ti
 
 ## Usage
 
-### Safeguards
-
-The program grants read _and_ write privileges to a codebase. This can be dangerous! Safeguards taken throughout this project included: (1) safely storing API keys; (2) limiting read-write privileges to a single directory; (3) protecting against directory traversal; (4) using timeout limits when running subprocesses; (5) setting an iteration limit to avoid infite agent call loops; and (6) setting a character limit for output to preserve tokens. Error handling was used, but did not cover all edge cases. 
-
-Safegaurds (1), (2), (5), and (6) are implemented via environmental variables in the the `.env` file, which the `.gitignore` file then protects from public exposure. Safeguards (3) and (4) are implemented via files in the `./functions/` folder.
-
 ### User Prompts
 
 After the virtual environment has been activated, users should use the following prompt format:
@@ -85,6 +82,14 @@ After the virtual environment has been activated, users should use the following
 > `python main.py 'ENTER YOUR PROMPT HERE' [--verbose]`
 
 The program will throw an error if a prompt is not entered after the program file name. Optionally, users can use a `--verbose` statement in the prompt for the response to report token input and output metadata.
+
+### Safeguards
+
+The program grants read _and_ write privileges to a codebase. This can be dangerous! Safeguards taken throughout this project included: (1) safely storing API keys; (2) limiting read-write privileges to a single directory; (3) protecting against directory traversal; (4) using timeout limits when running subprocesses; (5) setting an iteration limit to avoid infite agent call loops; and (6) setting a character limit for output to preserve tokens. Error handling was used, but did not cover all edge cases. 
+
+Safegaurds (1), (2), (5), and (6) are implemented via environmental variables in the the `.env` file, which the `.gitignore` file then protects from public exposure. Safeguards (3) and (4) are implemented via files in the `./functions/` folder.
+
+Lastly, at the end of each iterative call to the AI agent, the console prints out observability metrics. This includes API consumption levels and usage rate limits for requests per day (RPD), requests per minute (RPM), and tokens per minute (TPM). This is orchestrated by the `quota_tracker.py` file that reads and writes data to the `quota_log.json` file.
 
 ## System Design
 
@@ -103,6 +108,7 @@ The program will throw an error if a prompt is not entered after the program fil
 - Scalability: limiting output character length to preserve tokens (`MAX_CHAR_LIMIT` in `.env` file)
 - Security: (1) safely storing API keys (`GEMINI_API_KEY` in `.env` file); (2) limit read-write privileges to a single directory (`WORKING_DIRECTORY` in `.env` file); (3) protecting against directory traversal (conditional checks in `./functions/` files); (4) setting an iteration limit to avoid infite model + function execution loops (`MAX_ITERATIONS` in `.env` file)
 - CAP Theorem: prioritize consistency (read/writes must be correct) over availability
+- Observability: provide a log of API consumption and usage rate limits
 
 ### 2. Core Entities
 
@@ -110,6 +116,10 @@ The program will throw an error if a prompt is not entered after the program fil
 - **ModelSettings:** GEMINI_API_KEY, AI_MODEL, SYSTEM_PROMPT, available_functions (function schemas), conversation_history (content messages)
 - **ModelCalls:** MAX_ITERATIONS, current_iteration, model_response
 - **FunctionCalls:** WORKING_DIR, function_name, arguments, function_response
+- **APIUsageLogs:** tracked in `quota_log.json` as JSON arrays:
+  - `"daily_requests"`: timestamps of all requests for the current day
+  - `"minute_requests"`: timestamps of requests in the last 60 seconds
+  - `"minute_tokens"`: tuples of (timestamp, input tokens) in the last 60 seconds
 
 ### 3. API (or Interface)
 
@@ -136,7 +146,7 @@ I created the diagram above to illustrate [function calling with Gemini API](htt
 1. **Function Declarations:** The `./functions/schemas.py` file defined all external functions to be used by the model. The `./functions/call_function.py` file bundled these functions into a `types.Tool()` object.
 2. **Call Model:** The Gemini model is executed. This requires providing the model settings: `GEMINI_API_KEY`, `AI_MODEL`, `SYSTEM_PROMPT`, user prompt, conversation history, and function declarations.
 3. **Call Functions:** Function calls are executed. This requires parsing the model response from step (2) to determine function names and arguments to call. The `WORKING_DIR` must be provided on each function call.
-4. **Model Response:** The Gemini model is executed again within an agent loop that repeats steps (2) and (3). At the end of each cycle, the function response is parsed for content to update the conversation history. The agent loop runs at most for `MAX_ITERATIONS` and final output has a character limitation of `MAX_CHAR_LIMIT` to preserve tokens.
+4. **Model Response:** The Gemini model is executed again within an agent loop that repeats steps (2) and (3). At the end of each cycle, the function response is parsed for content to update the conversation history. The agent loop runs at most for `MAX_ITERATIONS` and final output has a character limitation of `MAX_CHAR_LIMIT` to preserve tokens. Final output includes information related to API consumption and usage rate limits. This information is taken froma JSON file that is updated between iterations of the AI agent.
 
 <img src="./public/function-calling-table.PNG" width="80%">
 
