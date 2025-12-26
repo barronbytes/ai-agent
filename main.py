@@ -55,9 +55,9 @@ def get_function_response_parts(
     log_request(response.usage_metadata.prompt_token_count)
     
     if is_verbose:
-        print(f"Requests per day (RPD): used {get_rpd} out of {threshold_rpd}")
-        print(f"Requests per minute (RPM): used {get_rpm} out of {threshold_rpm}")
-        print(f"Tokens per minute (RPM): used {get_tpm} out of {threshold_tpm}")
+        print(f"Requests per day (RPD): used {get_rpd()} out of {threshold_rpd()}")
+        print(f"Requests per minute (RPM): used {get_rpm()} out of {threshold_rpm()}")
+        print(f"Tokens per minute (RPM): used {get_tpm()} out of {threshold_tpm()}")
 
     function_response_parts: list[types.Part] = []
     if not response.function_calls:
