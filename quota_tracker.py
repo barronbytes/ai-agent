@@ -18,7 +18,11 @@ _daily_request_log = []
 try:
     with open(LOG_FILE, "r", encoding="utf-8") as f:
         data = json.load(f)
-        _daily_request_log = [datetime.fromisoformat(ts) for ts in data.get("daily", [])]
+        today = datetime.now().date()
+        _daily_request_log = [
+            datetime.fromisoformat(ts) for ts in data.get("daily", [])
+            if datetime.fromisoformat(ts).date() == today
+        ]
 except FileNotFoundError:
     _daily_request_log = []
 except Exception:
@@ -68,7 +72,7 @@ def log_request(input_tokens: int) -> None:
     _daily_request_log[:] = [dt for dt in _daily_request_log if dt.date() == today]
 
     # --- Save to daily log ---
-    _save_daily_log
+    _save_daily_log()
 
 
 def get_rpd() -> int:
